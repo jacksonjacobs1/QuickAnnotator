@@ -139,12 +139,12 @@ export const fetchAnnotationClassById = async (annotation_class_id: number) => {
 }
 
 // Fetch tiles by bounding box
-export const searchTiles = async (image_id: number, annotation_class_id: number, hasgt: boolean, include_placeholder_tiles: boolean, x1: number, y1: number, x2: number, y2: number) => {
+export const searchTiles = async (image_id: number, annotation_class_id: number, hasgt: boolean, create_missing_tiles: boolean, x1: number, y1: number, x2: number, y2: number) => {
     const query = new URLSearchParams({
         image_id: image_id.toString(),
         annotation_class_id: annotation_class_id.toString(),
         hasgt: hasgt.toString(),
-        include_placeholder_tiles: include_placeholder_tiles.toString(),
+        create_missing_tiles: create_missing_tiles.toString(),
         x1: x1.toString(),
         y1: y1.toString(),
         x2: x2.toString(),

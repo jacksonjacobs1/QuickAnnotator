@@ -42,7 +42,7 @@ class SearchTileArgsSchema(Schema):
     image_id = fields.Int(required=True)
     annotation_class_id = fields.Int(required=True)
     hasgt = fields.Bool(required=False)
-    include_placeholder_tiles = fields.Bool(required=False, default=False)    # A placeholder tile is a placeholder tile that has not yet been created in the database.
+    create_missing_tiles = fields.Bool(required=False, default=False)    # A placeholder tile is a placeholder tile that has not yet been created in the database.
     x1 = fields.Float(required=True)
     y1 = fields.Float(required=True)
     x2 = fields.Float(required=True)
@@ -127,12 +127,12 @@ class TileSearch(MethodView):
         
         tiles = query.all()
 
-        if args['include_placeholder_tiles']:
+        if args['create_missing_tiles']:
             existing_ids = set([tile.tile_id for tile in tiles])
-            placeholder_tile_ids = ids - existing_ids
-            placeholder_tiles = [qadb.Tile(tile_id=tile_id, image_id=args['image_id'], annotation_class_id=args['annotation_class_id'], seen=0, hasgt=False) for tile_id in placeholder_tile_ids]
-            
-            tiles.extend(placeholder_tiles)
+            new_tile_ids = ids - existing_ids
+            new_tiles = [qadb.Tile(tile_id=tile_id, image_id=args['image_id'], annotation_class_id=args['annotation_class_id'], seen=0, hasgt=False) for tile_id in new_tile_ids]
+            qadb.db.session.add_all(new_tiles) # TODO: replace with db_session once flask-sqlalchemy decoupling PR is merged.
+            tiles.extend(new_tiles)
         return tiles, 200
     
 @bp.route('/search/coordinates')
