@@ -179,13 +179,6 @@ const ViewportMap = (props: Props) => {
             .style('fill', true)
             .style('fillColor', 'lime')
             .style('fillOpacity', 0.5)
-            // .style('stroke', (a: Annotation) => {
-            //     if (a.id === props.currentAnnotation?.currentState?.id) {
-            //         console.log("Change stroke of polygon.")
-            //         return true
-            //     }
-            //     return false; // Default to no stroke
-            // })
             .style('strokeColor', 'black')
             .style('strokeWidth', 2)
             .geoOn(geo.event.feature.mousedown, handleMousedownOnPolygon)
@@ -509,6 +502,7 @@ const ViewportMap = (props: Props) => {
         console.log("Current annotation changed.");
         const currentState = props.currentAnnotation?.currentState;
         const prevState = props.prevCurrentAnnotation?.currentState;
+        const undoStackLength = props.prevCurrentAnnotation?.undoStack.length;
         const tile_id = currentState?.tile_id;
         const prevTileId = prevState?.tile_id;
         const annotationId = currentState?.id;
@@ -537,9 +531,11 @@ const ViewportMap = (props: Props) => {
         }
 
         if (prevAnnotationId && prevAnnotationId !== annotationId && props.currentImage && props.currentClass) {
-            putAnnotation(props.currentImage.id, prevState).then(() => {
-                console.log("Annotation updated.")
-            });
+            if (undoStackLength && undoStackLength > 1) {
+                putAnnotation(props.currentImage.id, prevState).then(() => {
+                    console.log("Annotation updated.")
+                });
+            }
         }
 
     }, [props.currentAnnotation])
