@@ -45,7 +45,7 @@ def insert_new_annotation(image_id, annotation_class_id, is_gt, tile_id, polygon
     db_session.commit()
     return new_annotation
 
-def get_annotation_query(model, scale_factor: float=1.0) -> Query:
+def get_annotation_query(model, scale_factor: float=1.0, simplify_thresh=0.0) -> Query:
     '''
     Constructs a SQLAlchemy query to retrieve and scale annotation data from the database.
     Args:
@@ -65,26 +65,15 @@ def get_annotation_query(model, scale_factor: float=1.0) -> Query:
     if scale_factor <= 0:
         raise ValueError("scale_factor must be greater than 0.")
     
-    if scale_factor == 1.0:
-        query = db_session.query(
-            model.id,
-            model.tile_id,
-            func.ST_AsGeoJSON(model.centroid).label('centroid'),
-            func.ST_AsGeoJSON(model.polygon).label('polygon'),
-            model.area,
-            model.custom_metrics,
-            model.datetime
-        )
-    else:
-        query = db_session.query(
-            model.id,
-            model.tile_id,
-            func.ST_AsGeoJSON(func.ST_Scale(model.centroid, scale_factor, scale_factor)).label('centroid'),
-            func.ST_AsGeoJSON(func.ST_Scale(model.polygon, scale_factor, scale_factor)).label('polygon'),
-            model.area,
-            model.custom_metrics,
-            model.datetime
-        )
+    query = db_session.query(
+        model.id,
+        model.tile_id,
+        func.ST_AsGeoJSON(func.ST_Scale(func.ST_SimplifyPreserveTopology(model.centroid, simplify_thresh), scale_factor, scale_factor)).label('centroid'),
+        func.ST_AsGeoJSON(func.ST_Scale(func.ST_SimplifyPreserveTopology(model.polygon, simplify_thresh), scale_factor, scale_factor)).label('polygon'),
+        model.area,
+        model.custom_metrics,
+        model.datetime
+    )
 
     return query
 

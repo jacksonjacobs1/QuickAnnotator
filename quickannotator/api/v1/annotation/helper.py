@@ -27,7 +27,7 @@ def annotations_within_bbox(table, x1, y1, x2, y2):
 def get_annotations_for_tile(image_id: int, annotation_class_id: int, tile_id: int, is_gt: bool) -> List[models.Annotation]:
     model: models.Annotation = create_dynamic_model(build_annotation_table_name(image_id, annotation_class_id, is_gt))
     scale_factor = base_to_work_scaling_factor(image_id, annotation_class_id)
-    result: List[models.Annotation] = get_annotation_query(model, 1/scale_factor).filter_by(tile_id=tile_id).all()
+    result: List[models.Annotation] = get_annotation_query(model, 1/scale_factor, simplify_thresh=200.0).filter_by(tile_id=tile_id).all()
     
     return result
 

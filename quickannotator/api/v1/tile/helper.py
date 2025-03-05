@@ -116,7 +116,7 @@ def get_tile_ids_intersecting_mask(image_id: int, annotation_class_id: int, mask
     tilespace = get_tilespace(image_id=image_id, annotation_class_id=annotation_class_id, in_work_mag=False)
     
     # Convert pixel coordinates to tile IDs
-    tile_ids = [tilespace.rc_to_tileid(row, col) for row, col in zip(filled_rows, filled_cols)]
+    tile_ids = [tilespace.rc_to_tileid(row, col) for row, col in zip(filled_rows.tolist(), filled_cols.tolist())]
 
     return tile_ids, mask, polygons
 

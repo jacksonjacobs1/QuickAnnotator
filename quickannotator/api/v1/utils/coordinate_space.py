@@ -38,7 +38,7 @@ class TileSpace:
         self.w = image_width
         self.h = image_height
 
-    def get_tile_ids_within_bbox(self, bbox: list[float]) -> list:
+    def get_tile_ids_within_bbox(self, bbox: list[float]) -> list[int]:
         """
         Get the tile IDs within a specified bounding box.
         This method calculates the tile IDs that fall within the given bounding box
@@ -76,7 +76,7 @@ class TileSpace:
         cols, rows = np.meshgrid(np.arange(start_col, end_col + 1), np.arange(start_row, end_row + 1))
 
         # Flatten the mesh grid and calculate tile IDs
-        tile_ids = (rows * tiles_per_row + cols).flatten().tolist()
+        tile_ids = (rows * tiles_per_row + cols).astype(int).flatten().tolist()
 
         return tile_ids
 

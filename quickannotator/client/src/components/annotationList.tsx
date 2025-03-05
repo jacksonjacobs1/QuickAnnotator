@@ -80,7 +80,10 @@ export default class AnnotationList extends React.Component<Props, any> {
 
     defineGrid() {
 
-        const polygonFormatter = (_row: number, _cell: number, value: Polygon, _columnDef: Column, _dataContext: any) => {
+        const polygonFormatter = (_row: number, _cell: number, value: Polygon | null, _columnDef: Column, _dataContext: any) => {
+            if (!value) {
+                return `<svg width='100' height='20'><circle cx='10' cy='10' r='5' style='fill:lime;stroke:purple;stroke-width:1' /></svg>`;
+            }
 
             const coordinates = value.coordinates[0];
             // Find min and max coordinates for scaling
