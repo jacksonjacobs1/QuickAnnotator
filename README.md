@@ -7,7 +7,6 @@ Machine learning approaches for segmentation of histologic primitives (e.g., cel
 QuickAnnotator leverages active learning to suggest annotations which the user may accept as they annotate.
 
 # Installation
-## For Developers
 ### Development Environment
 - VS Code with the following extensions:
     - `ms-azuretools.vscode-docker`
@@ -35,7 +34,7 @@ docker volume create qa_data    # Will store example WSIs
 ![image](https://github.com/user-attachments/assets/b776577f-a4c2-4eb8-858c-c603ac20cc6d)
 
 
-### Usage
+# Usage
 1. Once the devcontainer is built, you can run the following command to start the QuickAnnotator server:
     ```
     (venv) root@e4392ecdd8ef:/opt/QuickAnnotator# python3 -m quickannotator
@@ -85,3 +84,32 @@ docker volume create qa_data    # Will store example WSIs
     1. OpenAPI 3.0 documentation: [http://172.17.0.2:5000/api/v1]()
     2. Client: [http://172.17.0.2:5173/]()
 
+# Logs
+Logs are stored within the QuickAnnotator database and may be visualized using Grafana. The following instructions detail how to set up Grafana to connect to a sqlite database.
+
+1. Run the Grafana docker container
+    > Note: The following command assumes your sqlite database is contained in the base directory of the qadb_data volume.
+
+    ```bash
+    docker run -d \ 
+    --name=grafana \ 
+    -p 3000:3000 \ 
+    -v qadb_data:/var/lib/grafana/sqlite \ 
+    grafana/grafana 
+    ```
+
+2. **Within the grafana container** run the following command to add a sqlite data source:
+    ```bash
+    grafana cli plugins install frser-sqlite-datasource 
+    ```
+
+3. Restart the grafana container:
+    ```bash
+    docker restart grafana
+    ```
+
+4. Open the Grafana UI at [http://localhost:3000/dashboard/import]() and login with the default credentials:
+    - Username: admin
+    - Password: admin
+
+5. Drop the [grafana_dashboard.json](grafana_dashboard.json) file into the upload box and click "Import".
